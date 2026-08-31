@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import {DatabaseConnection} from '@/app/lib/config'
+import {Databaseconneaction} from '@/app/lib/config'
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/user.Models";
 
@@ -14,7 +14,7 @@ export async function POST(request:NextRequest){
         return NextResponse.json({error:"email and password requred"},{status:400})
       }
      
-    await DatabaseConnection();
+    await Databaseconneaction();
  
      const user = await User.findOne({email})
      if(user){
@@ -26,9 +26,8 @@ export async function POST(request:NextRequest){
          username,
          password
      })
-   await newuser.save()
  
-     return NextResponse.json({message:"Your new User successfly esiste"},{status:201})
+     return NextResponse.json({message:"Your new User successfly esiste",newuser},{status:201})
    } catch (error:any) {
      return NextResponse.json({error:error.message})
    }

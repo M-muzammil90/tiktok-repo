@@ -1,37 +1,30 @@
+import mongoose from "mongoose";
 
-import mongoose, { Mongoose } from 'mongoose'
-
-
-const MONGO_URL = process.env.MONGO_URL!
-
-if(!MONGO_URL){
-    throw new Error("plese MONGO_URL is required MONGO_URL without not accept your MONGO_URL connect")
+const MONGO_URL = process.env.MONGO_URL!;
+if (!MONGO_URL) {
+  throw new Error("please check your connection");
+}
+const cached = global.mongoose;
+if (!cached) {
+  const cached = (global.mongoose = { conn: null, promise: null });
 }
 
-let chated = global.mongoose
+export async function Databaseconneaction() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+  if (!cached.promise) {
+    const options = {
+      bufferCommands: true,
+      maxPoolSize: 10,
+    };
+    mongoose.connect(MONGO_URL, options).then(() => mongoose.connection);
+  }
 
-if(!chated){
-    chated = global.mongoose={conn:null,promise:null}
-}
-
-export async function DatabaseConnection(){
-    if(chated.conn){
-        return chated.conn
-    }
-    if(!chated.promise){
-        const option ={
-            bufferCommands:true,
-            MaxPoolSize:10
-        }
-    chated.promise = mongoose.connect(MONGO_URL,option).then(()=>mongoose.Connection)
-    }
-    try {
-        chated.conn = await chated.promise    
-    } catch (error) {
-        chated.promise = null
-        throw error
-    }
-
-    return chated.conn
-    
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
 }
