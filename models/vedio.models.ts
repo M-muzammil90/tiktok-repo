@@ -11,11 +11,11 @@ export interface IVEDEO {
   description: String;
   videoURL: String;
   thumbnailUrl: String;
-  controls: Boolean;
-  transformations: {
+  controls?: Boolean;
+  transformations?: {
     height: Number;
     width: Number;
-    quality: Number;
+    quality?: Number;
   };
 }
 
