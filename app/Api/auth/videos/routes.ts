@@ -44,13 +44,20 @@ export async function POST(request: NextRequest) {
     const viderOption ={
       ...body,
       controls:body?.controls ?? true,
-
+      transformations:{
+        height:1920,
+        width:1080,
+        quality: body.transformations?.quality ?? 100
+      }
     }
-
     const savedata = await Video.create(viderOption)
 
-    
+    return NextResponse.json(savedata)
 
-
-  } catch (error) {}
+  } catch (error) {
+     return NextResponse.json(
+        { error: "Server error Failed to create videos" },
+        { status: 400 },
+      );
+  }
 }
