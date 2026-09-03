@@ -1,9 +1,12 @@
-import { Connection } from "mongoose";
+import mongoose from "mongoose";
 
 declare global {
-   var mongoose:{
-        conn:Connection | null,
-        promise: Promise<Connection>|null
-    }
+  var mongoose:
+    | {
+        conn: typeof mongoose | null;
+        promise: ReturnType<typeof mongoose.connect> | null;
+      }
+    | undefined;
 }
-export {}
+
+export {};
