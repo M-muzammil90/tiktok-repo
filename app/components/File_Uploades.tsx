@@ -45,7 +45,7 @@ const FileUpload = ({ Onsuccess, onProgress, filetype }: FileUploadProps) => {
     setError(null);
 
     try {
-      const authRes = await fetch("/Api/auth/imgakit-auth");
+      const authRes = await fetch("/api/imgakit-auth");
       const auth = await authRes.json();
       const response = await upload({
         file,
@@ -55,9 +55,9 @@ const FileUpload = ({ Onsuccess, onProgress, filetype }: FileUploadProps) => {
         expire: auth.expire,
         token: auth.token,
         onProgress: (event) => {
-          if (event.lengthComputable || onProgress) {
-            const persectage = (event.loaded / event.total) * 100;
-            onProgress(Math.round(persectage));
+          if(event.lengthComputable || onProgress){
+        const persectage = (event.loaded / event.total) * 100;
+        onProgress(Math.round(persectage))
           }
         },
       });

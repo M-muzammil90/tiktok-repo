@@ -18,7 +18,7 @@ function Page() {
     setLoading(true);
 
     try {
-      const response = await fetch("/Api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

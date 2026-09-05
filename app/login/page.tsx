@@ -29,7 +29,7 @@ function Page() {
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        router.push("/");
+        router.push("videos");
         router.refresh();
       }
     } catch (error) {

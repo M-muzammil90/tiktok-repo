@@ -1,177 +1,184 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
+
+interface Video {
+  _id: string;
+  title: string;
+  description: string;
+  videoURL: string;
+  thumbnailUrl: string;
+  controls?: boolean;
+  transformations?: {
+    height?: number;
+    width?: number;
+    quality?: number;
+  };
+  createdAt?: string;
+}
 
 function Page() {
-  const [username,setUsername] = useState("")
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [videos, setVideos] = React.useState<Video[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
 
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setLoading(true);
-
+  const fetchVideos = async () => {
     try {
-      const response = await fetch("/Api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          confirmPassword,
-        }),
+      setLoading(true);
+      setError("");
+
+      const response = await fetch("/api/auth/videos", {
+        method: "GET",
+        cache: "no-store",
       });
 
       const data = await response.json();
 
-      if (data.error) {
-        alert(data.error);
-      } else {
-        router.push("/login");
+      console.log("VIDEOS:", data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch videos");
       }
+
+     setVideos(data.videos);
     } catch (error) {
       console.error(error);
-      alert("Something went wrong. Please try again.");
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  React.useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="mb-8 text-3xl font-bold text-gray-900">
+            All Videos
+          </h1>
+
+          <div className="flex min-h-[300px] items-center justify-center">
+            <p className="text-gray-500">
+              Loading videos...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8">
+        <div className="mx-auto max-w-7xl">
+          <h1 className="mb-8 text-3xl font-bold text-gray-900">
+            All Videos
+          </h1>
+
+          <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-600">
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-100 px-4 py-10">
+      <div className="mx-auto max-w-7xl">
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
-
-          {/* Heading */}
-          <div className="text-center mb-8">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Create Account
+              All Videos
             </h1>
 
-            <p className="text-gray-500 mt-2 text-sm">
-              Create your account to get started
+            <p className="mt-1 text-sm text-gray-500">
+              {videos.length} videos available
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* setUsername */}
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                 username
-              </label>
-
-              <input
-                id="username"
-                type="text"
-                placeholder="Enter your username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email Address
-              </label>
-
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Password
-              </label>
-
-              <input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Confirm Password
-              </label>
-
-              <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-
-            {/* Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? "Creating Account..." : "Register"}
-            </button>
-          </form>
-
-          {/* Login Link */}
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={() => router.push("/login")}
-              className="font-semibold text-blue-600 hover:text-blue-700"
-            >
-              Login
-            </button>
-          </p>
+          <button
+            onClick={fetchVideos}
+            className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+          >
+            Refresh
+          </button>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-gray-400 mt-6">
-          © 2026 Your App. All rights reserved.
-        </p>
+        {/* Empty */}
+        {videos.length === 0 ? (
+          <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-white shadow">
+            <p className="text-gray-500">
+              No videos found.
+            </p>
+          </div>
+        ) : (
+          /* Grid */
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {videos.map((video) => (
+              <div
+                key={video._id}
+                className="overflow-hidden rounded-2xl bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+              >
+                {/* Thumbnail */}
+                <div className="aspect-video overflow-hidden bg-gray-200">
+                  <img
+                    src={video.thumbnailUrl}
+                    alt={video.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
 
+                {/* Content */}
+                <div className="p-5">
+                  <h2 className="line-clamp-1 text-lg font-bold text-gray-900">
+                    {video.title}
+                  </h2>
+
+                  <p className="mt-2 line-clamp-2 text-sm text-gray-500">
+                    {video.description}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600">
+                      Quality:{" "}
+                      {video.transformations?.quality ?? 100}%
+                    </span>
+
+                    {video.createdAt && (
+                      <span className="text-xs text-gray-400">
+                        {new Date(
+                          video.createdAt
+                        ).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Watch */}
+                  <a
+                    href={video.videoURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 block w-full rounded-lg bg-gray-900 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-gray-800"
+                  >
+                    Watch Video
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

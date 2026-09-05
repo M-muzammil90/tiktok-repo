@@ -9,12 +9,12 @@ export default withAuth(
     callbacks:{
         authorized({ req , token }) {
         const {pathname} = req.nextUrl
-        if(pathname.startsWith('/Api/auth')||
+        if(pathname.startsWith('/api/auth/')||
         pathname === "/login"||
         pathname === "/register"       
        )
        return true
-       if(pathname === "/"|| pathname.startsWith("/Api/videos")){
+    if(pathname === "/"|| pathname.startsWith("/api/videos")){
        return true
        }
        return !!token
